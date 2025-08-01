@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth';
+import { getAuth, signInAnonymously, onAuthStateChanged } from 'firebase/auth';
 
 // Your Firebase configuration
 const firebaseConfig = {
@@ -21,6 +21,28 @@ export const db = getFirestore(app);
 
 // Initialize Auth
 export const auth = getAuth(app);
+
+// Function to sign in anonymously
+export const signInUser = async () => {
+  try {
+    const result = await signInAnonymously(auth);
+    console.log('✅ Signed in anonymously:', result.user.uid);
+    return result.user;
+  } catch (error) {
+    console.error('❌ Error signing in:', error);
+    return null;
+  }
+};
+
+// Function to get current user
+export const getCurrentUser = () => {
+  return auth.currentUser;
+};
+
+// Function to listen to auth state changes
+export const onAuthChange = (callback) => {
+  return onAuthStateChanged(auth, callback);
+};
 
 // Add error handling for development
 if (process.env.NODE_ENV === 'development') {

@@ -1,12 +1,36 @@
 import { useState, useEffect } from 'react';
 import { collection, addDoc, onSnapshot, query, orderBy, limit, serverTimestamp } from 'firebase/firestore';
-import { db } from '../firebase';
+import { db, auth, signInUser, getCurrentUser } from '../firebase';
 
 function FirebaseTest() {
   const [testMessage, setTestMessage] = useState('');
   const [messages, setMessages] = useState([]);
   const [connectionStatus, setConnectionStatus] = useState('Testing...');
   const [isConnected, setIsConnected] = useState(false);
+  const [user, setUser] = useState(null);
+  const [authStatus, setAuthStatus] = useState('Not signed in');
+
+  useEffect(() => {
+    // Sign in anonymously when component mounts
+    const initializeAuth = async () => {
+      try {
+        const currentUser = getCurrentUser();
+        if (!currentUser) {
+          const newUser = await signInUser();
+          setUser(newUser);
+          setAuthStatus(newUser ? '✅ Signed in anonymously' : '❌ Sign in failed');
+        } else {
+          setUser(currentUser);
+          setAuthStatus('✅ Already signed in');
+        }
+      } catch (error) {
+        console.error('Auth error:', error);
+        setAuthStatus('❌ Authentication error');
+      }
+    };
+
+    initializeAuth();
+  }, []);
 
   useEffect(() => {
     // Test Firebase connection
@@ -38,13 +62,14 @@ function FirebaseTest() {
   }, []);
 
   const sendTestMessage = async () => {
-    if (!testMessage.trim()) return;
+    if (!testMessage.trim() || !user) return;
     
     try {
       await addDoc(collection(db, 'test'), {
         message: testMessage,
         timestamp: serverTimestamp(),
-        sender: 'Test User'
+        sender: user.uid,
+        userName: `User ${user.uid.substring(0, 6)}`
       });
       setTestMessage('');
     } catch (error) {
@@ -55,6 +80,17 @@ function FirebaseTest() {
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg">
       <h2 className="text-2xl font-bold text-center mb-6">Firebase Connection Test</h2>
+      
+      {/* Authentication Status */}
+      <div className="p-4 rounded-lg mb-6 bg-blue-50 border border-blue-200">
+        <h3 className="font-semibold mb-2">Authentication Status:</h3>
+        <p className="text-blue-700">{authStatus}</p>
+        {user && (
+          <p className="text-sm text-blue-600 mt-1">
+            User ID: {user.uid.substring(0, 12)}...
+          </p>
+        )}
+      </div>
       
       {/* Connection Status */}
       <div className={`p-4 rounded-lg mb-6 ${
@@ -79,7 +115,7 @@ function FirebaseTest() {
           />
           <button
             onClick={sendTestMessage}
-            disabled={!isConnected || !testMessage.trim()}
+            disabled={!isConnected || !user || !testMessage.trim()}
             className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 disabled:opacity-50"
           >
             Send Test
@@ -95,6 +131,7 @@ function FirebaseTest() {
             <div key={msg.id} className="p-3 bg-gray-50 rounded-lg">
               <p className="font-medium">{msg.message}</p>
               <p className="text-sm text-gray-600">
+                By: {msg.userName || msg.sender?.substring(0, 6) || 'Unknown'} | 
                 {msg.timestamp?.toDate?.()?.toLocaleTimeString() || 'Just now'}
               </p>
             </div>
@@ -109,10 +146,12 @@ function FirebaseTest() {
       <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
         <h4 className="font-semibold text-yellow-800 mb-2">How to Test Real-time Features:</h4>
         <ol className="text-yellow-700 text-sm space-y-1">
-          <li>1. Open multiple browser tabs to this page</li>
-          <li>2. Send test messages from different tabs</li>
-          <li>3. Watch messages appear in real-time across all tabs</li>
-          <li>4. If this works, your Firebase is properly configured!</li>
+          <li>1. Make sure you see "✅ Signed in anonymously" above</li>
+          <li>2. Make sure you see "✅ Connected to Firebase!" above</li>
+          <li>3. Open multiple browser tabs to this page</li>
+          <li>4. Send test messages from different tabs</li>
+          <li>5. Watch messages appear in real-time across all tabs</li>
+          <li>6. If this works, your Firebase is properly configured!</li>
         </ol>
       </div>
     </div>
