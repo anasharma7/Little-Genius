@@ -4,9 +4,10 @@ import ChatRoom from './components/ChatRoom'
 import RealTimeCounter from './components/RealTimeCounter'
 import RealTimeDashboard from './components/RealTimeDashboard'
 import FirebaseTest from './components/FirebaseTest'
+import LocalRealTimeChat from './components/LocalRealTimeChat'
 
 function App() {
-  const [activeTab, setActiveTab] = useState('dashboard')
+  const [activeTab, setActiveTab] = useState('local-chat')
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -18,6 +19,16 @@ function App() {
         {/* Tab Navigation */}
         <div className="flex justify-center mb-8">
           <div className="bg-white rounded-lg shadow-md p-1">
+            <button
+              onClick={() => setActiveTab('local-chat')}
+              className={`px-6 py-2 rounded-md transition-colors ${
+                activeTab === 'local-chat'
+                  ? 'bg-green-500 text-white'
+                  : 'text-gray-600 hover:text-gray-800'
+              }`}
+            >
+              🚀 Local Chat (No Setup!)
+            </button>
             <button
               onClick={() => setActiveTab('dashboard')}
               className={`px-6 py-2 rounded-md transition-colors ${
@@ -63,6 +74,7 @@ function App() {
 
         {/* Content */}
         <div className="mb-8">
+          {activeTab === 'local-chat' && <LocalRealTimeChat />}
           {activeTab === 'dashboard' && <RealTimeDashboard appId="little-genius-67ad1" userId="demo-user" />}
           {activeTab === 'chat' && <ChatRoom />}
           {activeTab === 'counter' && <RealTimeCounter />}
@@ -71,13 +83,13 @@ function App() {
 
         {/* Setup Instructions */}
         <div className="max-w-2xl mx-auto bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-          <h3 className="font-semibold text-yellow-800 mb-2">Setup Instructions:</h3>
+          <h3 className="font-semibold text-yellow-800 mb-2">Quick Start:</h3>
           <ol className="text-sm text-yellow-700 space-y-1">
-            <li>1. ✅ Firebase project created: <strong>little-genius-67ad1</strong></li>
-            <li>2. ✅ Firestore Database enabled</li>
-            <li>3. ✅ Firebase config updated in <code className="bg-yellow-100 px-1 rounded">src/firebase.js</code></li>
-            <li>4. 🔧 Test Firebase connection using the "Firebase Test" tab above</li>
-            <li>5. 🎉 Open multiple browser tabs to test real-time functionality!</li>
+            <li>1. 🚀 <strong>Try "Local Chat" tab first</strong> - works immediately with no setup!</li>
+            <li>2. ✅ Open multiple browser tabs to test real-time features</li>
+            <li>3. 🔧 For Firebase features, use the "Firebase Test" tab</li>
+            <li>4. 🌟 For full collaboration, set up Firebase authentication</li>
+            <li>5. 💡 No external services needed for local chat!</li>
           </ol>
         </div>
       </div>
