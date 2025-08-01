@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import Pusher from 'pusher-js';
+import pusher, { getChannel } from '../pusher';
 
 function SimpleChat() {
   const [messages, setMessages] = useState([]);
@@ -8,18 +8,15 @@ function SimpleChat() {
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
-    // Initialize Pusher (you'll need to get free credentials from pusher.com)
-    const pusher = new Pusher('your-app-key', {
-      cluster: 'your-cluster',
-      encrypted: true
-    });
-
-    const channel = pusher.subscribe('chat-channel');
+    // Subscribe to the chat channel
+    const channel = getChannel('chat-channel');
     
+    // Listen for new messages
     channel.bind('new-message', (data) => {
       setMessages(prev => [...prev, data]);
     });
 
+    // Listen for connection events
     channel.bind('pusher:subscription_succeeded', () => {
       setIsConnected(true);
       console.log('✅ Connected to Pusher!');
@@ -47,15 +44,19 @@ function SimpleChat() {
       id: Date.now()
     };
 
-    // In a real app, you'd send this to your backend
-    // For now, we'll just add it locally
+    // Add message locally
     setMessages(prev => [...prev, messageData]);
+    
+    // Send to Pusher channel (this will trigger the event for other users)
+    const channel = getChannel('chat-channel');
+    channel.trigger('new-message', messageData);
+    
     setNewMessage('');
   };
 
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg">
-      <h2 className="text-2xl font-bold text-center mb-6">Simple Real-time Chat</h2>
+      <h2 className="text-2xl font-bold text-center mb-6">Pusher Real-time Chat</h2>
       
       {/* Connection Status */}
       <div className={`p-4 rounded-lg mb-6 ${
@@ -63,8 +64,13 @@ function SimpleChat() {
       }`}>
         <h3 className="font-semibold mb-2">Connection Status:</h3>
         <p className={isConnected ? 'text-green-700' : 'text-red-700'}>
-          {isConnected ? '✅ Connected to Pusher!' : '❌ Not connected (Pusher credentials needed)'}
+          {isConnected ? '✅ Connected to Pusher!' : '❌ Connecting to Pusher...'}
         </p>
+        {isConnected && (
+          <p className="text-sm text-green-600 mt-1">
+            App Key: 5a3bfdcf7b655154092b | Cluster: us2
+          </p>
+        )}
       </div>
 
       {/* User Name Input */}
@@ -117,16 +123,16 @@ function SimpleChat() {
         </button>
       </form>
 
-      {/* Setup Instructions */}
+      {/* Instructions */}
       <div className="mt-6 bg-yellow-50 p-4 rounded-lg border border-yellow-200">
-        <h4 className="font-semibold text-yellow-800 mb-2">To Enable Real-time Features:</h4>
+        <h4 className="font-semibold text-yellow-800 mb-2">How to Test Real-time Features:</h4>
         <ol className="text-yellow-700 text-sm space-y-1">
-          <li>1. Go to <a href="https://pusher.com/" target="_blank" rel="noopener noreferrer" className="underline">Pusher.com</a></li>
-          <li>2. Sign up for a free account</li>
-          <li>3. Create a new app</li>
-          <li>4. Copy your app key and cluster</li>
-          <li>5. Update the credentials in <code className="bg-yellow-100 px-1 rounded">src/pusher.js</code></li>
-          <li>6. Open multiple browser tabs to test real-time chat!</li>
+          <li>1. ✅ Pusher is configured with your credentials!</li>
+          <li>2. Open multiple browser tabs to this page</li>
+          <li>3. Enter different names in each tab</li>
+          <li>4. Send messages from different tabs</li>
+          <li>5. Watch messages appear in real-time across all tabs!</li>
+          <li>6. 🎉 Your real-time chat is working!</li>
         </ol>
       </div>
     </div>
