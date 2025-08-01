@@ -1,0 +1,28 @@
+{
+  "name": "Little Genius Real-time App",
+  "short_name": "Little Genius",
+  "description": "Real-time collaboration app for creative minds",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#007AFF",
+  "orientation": "portrait",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["social", "education", "productivity"],
+  "lang": "en",
+  "dir": "ltr"
+} 
