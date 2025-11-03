@@ -52,3 +52,10 @@ Visit `http://localhost:5173` to view the portfolio.
 ## License
 
 MIT
+
+## Deployment
+
+You can deploy this Vite app on many hosts:
+- Netlify: drag-and-drop the `dist/` folder
+- Vercel: import the repo and set framework to Vite
+- GitHub Pages: `npm run build` and publish `dist/`

@@ -1,4 +1,5 @@
 import './Footer.css'
+import { socialLinks } from '../data/socialLinks'
 
 function Footer() {
   const currentYear = new Date().getFullYear()
@@ -8,15 +9,11 @@ function Footer() {
       <div className="container">
         <p>&copy; {currentYear} Ana Sharma. All rights reserved.</p>
         <div className="footer-links">
-          <a href="https://github.com" target="_blank" rel="noopener noreferrer">
-            GitHub
-          </a>
-          <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer">
-            LinkedIn
-          </a>
-          <a href="mailto:ana@example.com">
-            Email
-          </a>
+          {socialLinks.map((link) => (
+            <a key={link.label} href={link.href} target={link.href.startsWith('http') ? '_blank' : undefined} rel={link.href.startsWith('http') ? 'noopener noreferrer' : undefined}>
+              {link.label}
+            </a>
+          ))}
         </div>
       </div>
     </footer>
